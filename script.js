@@ -17,49 +17,91 @@ var cz = 0;
 
 var axes = {c: "black", m: [{m: [[-w/3, 0, 0], [w/3, 0, 0]]}, {m: [[0, 0, -w/3], [0, 0, w/3]]} ,{m: [[-0, -h/3, 0], [0, h/2, 0]]}]};
 
-var objects = [box(0, 0, 0, 100, 100, 40)];
+var height_map = [
+    [100, 200, 300, 200],
+    [50, 100, 20, 50],
+    [60, 120, 10, 20],
+];
+
+var objects = [];
 
 init();
+
 function init() {
+    init_map();
     repaint();
 }
 
+function init_map() {
+    var w = 100;
+    var d = 100;
+    objects = height_map.map(function(row, i){
+        return row.map(function(height, j) {
+            return box(i*w, 0, j*d, d, w, height);
+        })
+    })
+}
+
 function repaint() {
-    objects.forEach(function(o) {
-        o.m.sort(function(a, b) {
-            var a_z = mid(a.m, 2);
-            var b_z = mid(b.m, 2);
-
-            var alpha = Math.abs(alphadeg);
-            var beta = Math.abs(betadeg);
-
-            if(a_z - b_z == 0) {
-                var a_y = mid(a.m, 1);
-                var b_y = mid(b.m, 1);
-                if(a_y == b_y) {
-                    var a_x = mid(a.m, 0);
-                    var b_x =  mid(b.m, 0);
-                    if((betadeg < 0 && betadeg > -190)
-                       || (betadeg > 180 && betadeg < 360)){
-                        return b_x - a_x;
-                    }
-                    return a_x - b_x;
-                }
-                return b_y - a_y;
-            }
-            if((alpha < 90 || alpha > 225) && (beta < 90 || beta > 270)) {
-                return a_z - b_z;
-            } else {
-                return b_z - a_z;
-            }
-        });
-    });
-
     ctx.clearRect(0, 0, c.width, c.height);
+
     draw(axes, w/3, h/3, 0, 0, 0);
-    objects.forEach(function(o) {
-        draw(o, w/3, h/3, cx, cy, cz);
-    });
+
+    var sort_sides = function(a, b) {
+        var a_z = mid(a.m, 2);
+        var b_z = mid(b.m, 2);
+
+        var alpha = Math.abs(alphadeg);
+        var beta = Math.abs(betadeg);
+
+        if(a_z - b_z == 0) {
+            var a_y = mid(a.m, 1);
+            var b_y = mid(b.m, 1);
+            if(a_y == b_y) {
+                var a_x = mid(a.m, 0);
+                var b_x =  mid(b.m, 0);
+                if((betadeg < 0 && betadeg > -190)
+                   || (betadeg > 180 && betadeg < 360)){
+                    return b_x - a_x;
+                }
+                return a_x - b_x;
+            }
+            return b_y - a_y;
+        }
+        if((alpha < 90 || alpha > 225) && (beta < 90 || beta > 270)) {
+            return a_z - b_z;
+        } else {
+            return b_z - a_z;
+        }
+    };
+
+    // Draw order depends on camera angle, that is, which quadrant
+    // world currently is in.
+    var qr = function(qx,qy) {
+        var f = function(q, i, offset) {
+            return q == 0 ? i : offset - i
+        }
+        for(var i = 0; i < objects.length; i++) {
+            var offset_i = objects.length - 1;
+            var offset_j = objects[i].length - 1;
+            for(var j = 0; j < objects[i].length; j++) {
+                var o = objects[f(qx,i, offset_i)][f(qy,j, offset_j)];
+                o.m.sort(sort_sides);
+                draw(o, w/2, h/2, cx, cy, cz);
+            }
+        }
+    };
+
+    if((betadeg <= 90 && betadeg >= 0) || (betadeg <= -270 && betadeg >= -360)) {
+        qr(0,0);
+    } else if ((betadeg <= 0 && betadeg >= -90) || (betadeg >= 270 && betadeg <= 360)) {
+        qr(1,0);
+    } else if ((betadeg <= -90 && betadeg >= -180) || (betadeg >= 180 && betadeg <= 270)) {
+        qr(1,1);
+    } else if (betadeg <= -180 >= -270) {
+        qr(0,1);
+    }
+
     window.requestAnimationFrame(repaint);
 }
 
