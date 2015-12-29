@@ -5,7 +5,7 @@ var w = c.width;
 var h = c.height;
 
 var alphadeg = 35.264;
-var betadeg = 45;
+var betadeg = -10;
 
 var alpha = deg2rad(alphadeg);
 var beta = deg2rad(betadeg);
@@ -15,9 +15,9 @@ var cx = 0;
 var cy = 0;
 var cz = 0;
 
-var axes = {c: "black", m: [{m: [[-w/2, 0, 0], [w/2, 0, 0]]}, {m: [[0, 0, -w/2], [0, 0, w/2]]} ,{m: [[-0, -h/2, 0], [0, h/2, 0]]}]};
+var axes = {c: "black", m: [{m: [[-w/3, 0, 0], [w/3, 0, 0]]}, {m: [[0, 0, -w/3], [0, 0, w/3]]} ,{m: [[-0, -h/3, 0], [0, h/2, 0]]}]};
 
-var objects = [box(50,50,0, 100, 100, 200)];
+var objects = [box(0, 0, 0, 100, 100, 40)];
 
 init();
 function init() {
@@ -56,9 +56,9 @@ function repaint() {
     });
 
     ctx.clearRect(0, 0, c.width, c.height);
-    draw(axes, w/2, h/2, 0, 0, 0);
+    draw(axes, w/3, h/3, 0, 0, 0);
     objects.forEach(function(o) {
-        draw(o, w/2, h/2, cx, cy, cz);
+        draw(o, w/3, h/3, cx, cy, cz);
     });
     window.requestAnimationFrame(repaint);
 }
@@ -149,7 +149,8 @@ function isofy(mp) {
     return b;
 }
 
-function box(x, y, z, d, w, h, color) {
+function box(x, y, z, d, w, h0, color) {
+    var h = -h0;
     var short1 = [
         [x,   y,   z],
         [x,   y+h, z],
@@ -164,10 +165,10 @@ function box(x, y, z, d, w, h, color) {
     ];
 
     var roof = [
-        [x,   y, z],
-        [x+w, y, z],
-        [x+w, y, z+d],
-        [x,   y, z+d]
+        [x,   y+h, z],
+        [x+w, y+h, z],
+        [x+w, y+h, z+d],
+        [x,   y+h, z+d]
     ];
 
     var long1 = [
