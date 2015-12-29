@@ -4,13 +4,13 @@ var ctx = c.getContext("2d");
 var w = c.width;
 var h = c.height;
 
-var alphadeg = 35.264;
-var betadeg = -10;
+var alphadeg = 35;
+var betadeg = 10;
 
 var alpha = deg2rad(alphadeg);
 var beta = deg2rad(betadeg);
 
-var cstep = 5;
+var cstep = 2.5;
 var cx = 0;
 var cy = 0;
 var cz = 0;
