@@ -216,13 +216,14 @@ function cm(a, b) {
     return c;
 }
 
-function mid(points, i) {
-    var min = points.reduce(function(acc, curr) {
-        return Math.min(acc, curr[i]);
+function mreduce(points, i, fun) {
+    return points.reduce(function(acc, curr) {
+        return fun(acc, curr[i]);
     }, points[0][i]);
-    var max = points.reduce(function(acc, curr) {
-        return Math.max(acc, curr[i]);
-    }, points[0][i]);
+}
 
+function mid(points, i) {
+    var min = mreduce(points, i, Math.min);
+    var max = mreduce(points, i, Math.max);
     return (min+max)/2;
 }
