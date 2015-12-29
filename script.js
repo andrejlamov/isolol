@@ -229,10 +229,10 @@ function box(x, y, z, d, w, h0, color) {
 
     return {
         m: [
-            {c: "red",   m: short1},
-            {c: "blue",  m: short2},
+            {c: "brown",   m: short1},
+            {c: "brown",  m: short2},
             {c: "green", m: roof},
-            {c: "grey",  m: long1},
+            {c: "brown",  m: long1},
             {c: "brown",  m: long2}
         ]};
 };
